@@ -1,0 +1,257 @@
+-- 使用数据库 `school`
+USE school;
+
+-- 创建用户表
+CREATE TABLE `sys_user` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+  `username` VARCHAR(50) NOT NULL COMMENT '用户名',
+  `password` VARCHAR(100) NOT NULL COMMENT '密码',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_username` (`username`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
+
+-- 创建角色表
+CREATE TABLE `sys_role` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '角色ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '角色名',
+  `code` VARCHAR(50) NOT NULL COMMENT '角色编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色表';
+
+-- 创建用户角色表
+CREATE TABLE `sys_user_role_mapping` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户角色ID',
+  `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  `role_id` BIGINT UNSIGNED NOT NULL COMMENT '角色ID',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_role` (`user_id`, `role_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户角色映射表';
+
+-- 创建权限表
+CREATE TABLE `sys_permission` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '权限ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '权限名',
+  `code` VARCHAR(50) NOT NULL COMMENT '权限编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='权限表';
+
+-- 创建角色权限表
+CREATE TABLE `sys_role_permission_mapping` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '角色权限ID',
+  `role_id` BIGINT UNSIGNED NOT NULL COMMENT '角色ID',
+  `permission_id` BIGINT UNSIGNED NOT NULL COMMENT '权限ID',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_role_permission` (`role_id`, `permission_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色权限映射表';
+
+-- 创建菜单表
+CREATE TABLE `sys_menu` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '菜单ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '菜单名',
+  `code` VARCHAR(50) NOT NULL COMMENT '菜单编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `icon` VARCHAR(50) NOT NULL COMMENT '图标',
+  `url` VARCHAR(200) NOT NULL DEFAULT '' COMMENT 'URL',
+  `parent_id` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '父菜单ID',
+  `sort` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
+  `hierarchy` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '层级; 0-一级菜单; 1-二级菜单; 2-三级菜单',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='菜单表';
+
+-- 创建角色菜单表
+CREATE TABLE `sys_role_menu_mapping` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '角色菜单ID',
+  `role_id` BIGINT UNSIGNED NOT NULL COMMENT '角色ID',
+  `menu_id` BIGINT UNSIGNED NOT NULL COMMENT '菜单ID',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_role_menu` (`role_id`, `menu_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='角色菜单映射表';
+
+-- 创建刷新令牌表
+CREATE TABLE `sys_refresh_token` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '刷新令牌ID',
+  `token` VARCHAR(200) NOT NULL COMMENT '刷新令牌',
+  `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  `expire_time` DATETIME NOT NULL COMMENT '过期时间',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `used_time` DATETIME DEFAULT NULL COMMENT '使用时间',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_token` (`token`),
+  UNIQUE KEY `uk_user_id` (`user_id`),
+  KEY `idx_expire_time` (`expire_time`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='刷新令牌表';
+
+-- 创建字典表
+CREATE TABLE `sys_dict` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '字典ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '字典名',
+  `code` VARCHAR(50) NOT NULL COMMENT '字典编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='字典表';
+
+-- 创建字典项表
+CREATE TABLE `sys_dict_item` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '字典项ID',
+  `dict_id` BIGINT UNSIGNED NOT NULL COMMENT '字典ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '字典项名',
+  `code` VARCHAR(50) NOT NULL COMMENT '字典项编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `sort` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_dict_code` (`dict_id`, `code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='字典项表';
+
+-- 创建部门表
+CREATE TABLE `sys_department` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '部门ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '部门名',
+  `code` VARCHAR(50) NOT NULL COMMENT '部门编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `parent_id` BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '父部门ID',
+  `sort` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '排序',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='部门表';
+
+-- 创建员工表
+CREATE TABLE `sys_employee` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '员工ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '员工名',
+  `code` VARCHAR(50) NOT NULL COMMENT '员工编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `department_id` BIGINT UNSIGNED NOT NULL COMMENT '部门ID',
+  `position` VARCHAR(50) NOT NULL COMMENT '职位',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='员工表';
+
+-- 创建岗位表
+CREATE TABLE `sys_post` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '岗位ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '岗位名',
+  `code` VARCHAR(50) NOT NULL COMMENT '岗位编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='岗位表';
+
+-- 创建部门员工岗位映射表
+CREATE TABLE `sys_department_employee_post_mapping` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '部门员工岗位映射ID',
+  `department_id` BIGINT UNSIGNED NOT NULL COMMENT '部门ID',
+  `employee_id` BIGINT UNSIGNED NOT NULL COMMENT '员工ID',
+  `post_id` BIGINT UNSIGNED NOT NULL COMMENT '岗位ID',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_department_employee_post` (`department_id`, `employee_id`, `post_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='部门员工岗位映射表';
+
+-- 创建系统日志表
+CREATE TABLE `sys_log` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '日志ID',
+  `log_level` VARCHAR(10) NOT NULL COMMENT '日志级别; INFO, WARN, ERROR',
+  `log_type` VARCHAR(50) NOT NULL COMMENT '日志类型; SYSTEM, USER_OPERATION',
+  `message` TEXT NOT NULL COMMENT '日志内容',
+  `user_id` BIGINT UNSIGNED COMMENT '用户ID',
+  `username` VARCHAR(50) COMMENT '用户名',
+  `operation` VARCHAR(50) COMMENT '操作类型; LOGIN, LOGOUT, UPDATE',
+  `request_method` VARCHAR(10) COMMENT '请求方法; GET, POST, PUT',
+  `request_url` VARCHAR(200) COMMENT '请求URL',
+  `request_params` TEXT COMMENT '请求参数',
+  `response_status` INT UNSIGNED COMMENT '响应状态',
+  `response_data` TEXT COMMENT '响应数据',
+  `ip_address` VARCHAR(50) COMMENT 'IP地址',
+  `device_info` VARCHAR(200) COMMENT '设备信息',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `is_success` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否成功; 0-失败; 1-成功',
+  `error_message` TEXT COMMENT '错误信息',
+  `stack_trace` TEXT COMMENT '堆栈信息',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统日志表';
+
+-- 创建系统配置表
+CREATE TABLE `sys_config` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '配置ID',
+  `config_key` VARCHAR(50) NOT NULL COMMENT '配置键',
+  `config_value` TEXT NOT NULL COMMENT '配置值',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_config_key` (`config_key`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统配置表';
+
+-- 创建文件表
+CREATE TABLE `sys_file` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '文件ID',
+  `file_name` VARCHAR(200) NOT NULL COMMENT '文件名',
+  `file_path` VARCHAR(200) NOT NULL COMMENT '文件路径',
+  `file_type` VARCHAR(50) NOT NULL COMMENT '文件类型',
+  `file_size` BIGINT UNSIGNED NOT NULL COMMENT '文件大小',
+  `upload_user_id` BIGINT UNSIGNED NOT NULL COMMENT '上传用户ID',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件管理表';
+
+-- 创建通知表
+CREATE TABLE `sys_notification` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '通知ID',
+  `title` VARCHAR(100) NOT NULL COMMENT '通知标题',
+  `content` TEXT NOT NULL COMMENT '通知内容',
+  `type` VARCHAR(50) NOT NULL COMMENT '通知类型; SYSTEM, USER',
+  `is_read` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否已读; 0-未读; 1-已读',
+  `user_id` BIGINT UNSIGNED NOT NULL COMMENT '用户ID',
+  `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='通知表';
