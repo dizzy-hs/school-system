@@ -14,29 +14,31 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
-CREATE TABLE `sys_user` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-  `username` VARCHAR(50) NOT NULL COMMENT '用户名',
-  `password` VARCHAR(100) NOT NULL COMMENT '密码',
+CREATE TABLE `sys_permission` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '权限ID',
+  `name` VARCHAR(50) NOT NULL COMMENT '权限名',
+  `code` VARCHAR(50) NOT NULL COMMENT '权限编码',
+  `description` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '描述',
   `is_valid` TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '是否有效; 0-无效; 1-有效',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '是否删除; 0-未删除; 1-已删除',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_username` (`username`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
+  UNIQUE KEY `uk_code` (`code`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='权限表';
  */
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_user")
-public class SysUser {
+@AllArgsConstructor
+@TableName(value = "sys_permission")
+public class SysPermission {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    private String username;
-    private String password;
+    private String name;
+    private String code;
+    private String description;
     private Boolean isValid;
 
     @TableField(value = "create_time", fill = FieldFill.INSERT)
