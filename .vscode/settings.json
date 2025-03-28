@@ -1,4 +1,10 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.dependency.packagePresentation": "flat"
+    "java.dependency.packagePresentation": "flat",
+    "java.configuration.maven.globalSettings": "C:\\Program Files\\maven\\apache-maven-3.8.8\\conf\\settings.xml",
+    "maven.terminal.useJavaHome": true,
+    "java.compile.nullAnalysis.mode": "automatic",
+    "maven.pomfile.autoUpdateEffectivePOM": true,
+    "maven.executable.preferMavenWrapper": false,
+    "java.maven.updateSnapshots": true
 }
